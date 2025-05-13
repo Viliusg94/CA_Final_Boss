@@ -6,23 +6,18 @@
 !README.md
 !requirements.txt
 !LICENSE
-!*.py
 
-# Tikslingai nurodome, kuriuos aplankus ir failus sekti
-!database/
-!database/**/*.py
-!app/
-!app/**/*.py
-!ml_models/
-!ml_models/**/*.py
-!preprocessing/
-!preprocessing/**/*.py
-!templates/
-!templates/**/*.html
-!static/
-!static/**/*.css
-!static/**/*.js
-!static/**/*.png
+# Tikslingai sekame versijuotą kodą
+!v1/
+!v1/**/*.py
+!v1/**/*.md
+!v1/**/*.txt
+!v1/app/**/*
+!v1/data/**/*.py
+!v1/database/**/*.py
+!v1/models/**/*.py
+!v1/utils/**/*.py
+!v1/tests/**/*.py
 
 # Visada ignoruojame šiuos:
 __pycache__/
@@ -33,3 +28,6 @@ __pycache__/
 *.sqlite
 *.db
 .DS_Store
+venv/
+.venv/
+.ipynb_checkpoints/
