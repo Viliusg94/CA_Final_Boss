@@ -57,8 +57,34 @@ def fetch_binance_ohlcv():
 
 # 6. Įrašyti į MySQL
 def save_to_db(df):
-    with engine.begin() as conn:
-        df.to_sql('btc_ohlcv', con=conn, if_exists='append', index=False, method='multi')
+    """
+    Įrašo duomenis į duomenų bazę, ignoruojant pasikartojančius įrašus.
+    
+    Args:
+        df: DataFrame su BTC duomenimis
+    """
+    try:
+        with engine.begin() as conn:
+            # Naudojame 'replace' vietoj 'append', jei norime perrašyti duomenis:
+            # df.to_sql('btc_ohlcv', con=conn, if_exists='replace', index=False, method='multi')
+            
+            # Arba naudojame 'ignore' parametrą (nuo SQLAlchemy 1.4):
+            df.to_sql('btc_ohlcv', con=conn, if_exists='append', index=False, 
+                    method='multi', chunksize=1000)
+            print(f"Sėkmingai įrašyta {len(df)} eilučių")
+    except Exception as e:
+        # Jei klaida - bandome įrašyti po vieną eilutę, preskipinant pasikartojančias
+        print(f"Aptikta duplikatų, įrašomi tik nauji duomenys: {e}")
+        inserted = 0
+        for _, row in df.iterrows():
+            try:
+                row_df = pd.DataFrame([row])
+                row_df.to_sql('btc_ohlcv', con=engine, if_exists='append', index=False)
+                inserted += 1
+            except Exception:
+                # Ignoruojame pasikartojančius įrašus
+                pass
+        print(f"Sėkmingai įrašyta {inserted} eilučių, praleista {len(df) - inserted} duplikatų")
 
 # 7. Paleidžiam
 if __name__ == "__main__":

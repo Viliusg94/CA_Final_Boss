@@ -1,0 +1,62 @@
+<!-- filepath: d:\CA_Final_Boss\templates\index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Bitcoin Prognozavimo Sistema</h1>
+    <p class="lead">Sistema leidžia treniruoti mašininio mokymosi modelį ir prognozuoti Bitcoin kainos judėjimą.</p>
+    <hr class="my-4">
+    <p>Pasirinkite, ką norite daryti:</p>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Treniruoti modelį</h5>
+                    <p class="card-text">Treniruokite naują mašininio mokymosi modelį naudodami istorinius Bitcoin duomenis.</p>
+                    <a href="{{ url_for('training.train') }}" class="btn btn-primary">Treniruoti</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Prognozuoti</h5>
+                    <p class="card-text">Prognozuokite Bitcoin kainos judėjimą ateinančiai dienai.</p>
+                    <a href="{{ url_for('prediction.predict') }}" class="btn btn-success">Prognozuoti</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Paskutinių mokymų rezultatai -->
+    {% if models %}
+    <h3 class="mt-4">Paskutiniai apmokyti modeliai</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Pavadinimas</th>
+                    <th>Sukūrimo data</th>
+                    <th>Tikslumas</th>
+                    <th>Preciziškumas</th>
+                    <th>Jautrumas</th>
+                    <th>F1 rezultatas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for model in models %}
+                <tr>
+                    <td>{{ model.name }}</td>
+                    <td>{{ model.created_at }}</td>
+                    <td>{{ model.accuracy|round(4) }}</td>
+                    <td>{{ model.precision|round(4) }}</td>
+                    <td>{{ model.recall|round(4) }}</td>
+                    <td>{{ model.f1_score|round(4) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

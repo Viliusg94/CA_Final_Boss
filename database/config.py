@@ -28,3 +28,15 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def create_tables():
+    """
+    Sukuria duomenų bazėje visas lenteles pagal ORM modelius.
+    """
+    # Importuojame visus modelius, kad būtų užregistruoti su Base
+    from database.models import BtcPrice, User, UserUpload, ModelResult, BtcOHLCV, BtcFeatures, MLModel
+    
+    # Sukuriame lenteles
+    Base.metadata.create_all(bind=engine)
+    print("Duomenų bazės lentelės sukurtos!")
+    return True

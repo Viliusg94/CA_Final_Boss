@@ -3,8 +3,13 @@ DB ryšio testas.
 """
 
 import logging
+import os
+import sys
 from sqlalchemy import text
-from .config import SessionLocal, DB_USER, DB_HOST, DB_NAME
+
+# Pakeičiame importą iš santykinio į tiesioginį
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from database.config import SessionLocal, DB_USER, DB_HOST, DB_NAME
 
 # Paprastas logeris
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')

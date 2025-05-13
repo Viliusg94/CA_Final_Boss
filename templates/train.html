@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Treniruoti modelį</h1>
+<p>Nustatykite modelio parametrus ir spauskite "Treniruoti".</p>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('training.train') }}">
+            <!-- form content -->
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Skriptas, kuris rodo/slepia atitinkamus parametrus pagal pasirinktą modelio tipą
+    document.getElementById('model_type').addEventListener('change', function() {
+        const modelType = this.value;
+        const rfParams = document.querySelectorAll('.rf-param');
+        const gbParams = document.querySelectorAll('.gb-param');
+        const svmParams = document.querySelectorAll('.svm-param');
+        
+        // Pradžioje paslepiame visus
+        rfParams.forEach(param => param.style.display = 'none');
+        gbParams.forEach(param => param.style.display = 'none');
+        svmParams.forEach(param => param.style.display = 'none');
+        
+        // Rodome tik reikalingus
+        if (modelType === 'random_forest') {
+            rfParams.forEach(param => param.style.display = 'block');
+        } else if (modelType === 'gradient_boosting') {
+            gbParams.forEach(param => param.style.display = 'block');
+        } else if (modelType === 'svm') {
+            svmParams.forEach(param => param.style.display = 'block');
+        }
+    });
+    
+    {% if training_result and training_result.feature_importance and training_result.feature_names %}
+    // Grafikas svarbiausiems požymiams
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('featuresChart').getContext('2d');
+        const featuresChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ training_result.feature_names|tojson }},
+                datasets: [{
+                    label: 'Požymių svarba',
+                    data: {{ training_result.feature_importance|tojson }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+    {% endif %}
+</script>
+{% endblock %}

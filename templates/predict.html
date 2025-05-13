@@ -1,0 +1,156 @@
+Final_Boss\v1\templates\predict.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Prognozuoti Bitcoin kainą</h1>
+<p>Pasirinkite modelį ir spauskite "Prognozuoti".</p>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('prediction.predict') }}">
+            <div class="mb-3">
+                <label for="model_id" class="form-label">Pasirinkite modelį</label>
+                <select class="form-select" id="model_id" name="model_id" required>
+                    <option value="" selected disabled>Pasirinkite...</option>
+                    {% for model in available_models %}
+                    <option value="{{ model.id }}">
+                        {{ model.name }} (Tikslumas: {{ model.accuracy|round(4) }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="prediction_horizon" class="form-label">Prognozės horizontas (dienomis)</label>
+                <input type="number" class="form-control" id="prediction_horizon" name="prediction_horizon" 
+                       min="1" max="30" value="1">
+                <small class="form-text text-muted">Kiek dienų į priekį prognozuoti</small>
+            </div>
+            
+            <button type="submit" class="btn btn-success">Prognozuoti</button>
+        </form>
+    </div>
+</div>
+
+<!-- Prognozės rezultatai, jei jau atlikta -->
+{% if prediction_result %}
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h3>Prognozės rezultatai</h3>
+    </div>
+    <div class="card-body">
+        <h5>Pagrindinė prognozė:</h5>
+        <div class="alert {% if prediction_result.prediction == 1 %}alert-success{% else %}alert-danger{% endif %} mb-4">
+            <h4>
+                {% if prediction_result.prediction == 1 %}
+                <i class="fas fa-arrow-up"></i> Kaina turėtų kilti (👍)
+                {% else %}
+                <i class="fas fa-arrow-down"></i> Kaina turėtų kristi (👎)
+                {% endif %}
+            </h4>
+            <p>Tikimybė: {{ prediction_result.probability|round(4) }}</p>
+        </div>
+        
+        <!-- Grafikas kainai atvaizduoti -->
+        <div class="mt-4">
+            <h5>Paskutinės kainos ir prognozė:</h5>
+            <canvas id="priceChart" width="400" height="200"></canvas>
+        </div>
+        
+        <!-- Techninių indikatorių reikšmės -->
+        <div class="mt-4">
+            <h5>Pagrindinių indikatorių reikšmės:</h5>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Indikatorius</th>
+                            <th>Reikšmė</th>
+                            <th>Interpretacija</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>RSI (14)</td>
+                            <td>{{ prediction_result.indicators.rsi_14|round(2) }}</td>
+                            <td>
+                                {% if prediction_result.indicators.rsi_14 > 70 %}
+                                Perkrauta pirkimais (galimas kainų kritimas)
+                                {% elif prediction_result.indicators.rsi_14 < 30 %}
+                                Perkrauta pardavimais (galimas kainų kilimas)
+                                {% else %}
+                                Neutrali zona
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MACD</td>
+                            <td>{{ prediction_result.indicators.macd|round(2) }}</td>
+                            <td>
+                                {% if prediction_result.indicators.macd > 0 %}
+                                Teigiamas (rinkos kilimo tendencija)
+                                {% else %}
+                                Neigiamas (rinkos kritimo tendencija)
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bollinger plotis</td>
+                            <td>{{ prediction_result.indicators.bb_width|round(4) }}</td>
+                            <td>
+                                {% if prediction_result.indicators.bb_width > 0.1 %}
+                                Didelis kintamumas
+                                {% else %}
+                                Mažas kintamumas
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% if prediction_result %}
+    // Grafikas kainai atvaizduoti
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    const priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ prediction_result.dates|tojson }},
+            datasets: [
+                {
+                    label: 'Bitcoin kaina (USD)',
+                    data: {{ prediction_result.prices|tojson }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    pointRadius: 3
+                },
+                {
+                    label: 'Prognozė',
+                    data: {{ prediction_result.predicted_prices|tojson }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 5
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}
