@@ -1,33 +1,53 @@
-# Ignoruojame viską
-*
-
-# Dabar išvardijame failus, kuriuos norime sekti
-!.gitignore
-!README.md
-!requirements.txt
-!LICENSE
-
-# Tikslingai sekame versijuotą kodą
-!v1/
-!v1/**/*.py
-!v1/**/*.md
-!v1/**/*.txt
-!v1/app/**/*
-!v1/data/**/*.py
-!v1/database/**/*.py
-!v1/models/**/*.py
-!v1/utils/**/*.py
-!v1/tests/**/*.py
-
-# Visada ignoruojame šiuos:
+# Python bytecode files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Environment and local configuration
 .env
-*.log
-*.sqlite
-*.db
-.DS_Store
+.venv
+env/
 venv/
-.venv/
-.ipynb_checkpoints/
+ENV/
+env.bak/
+venv.bak/
+.env.local
+**/venv/
+v1/venv/
+v1/venv/**/*
+
+# Database files
+*.db
+*.sqlite*
+
+# Logs and temporary files
+*.log
+.DS_Store
+*.tmp
+*.bak
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Large data files
+*.csv
+*.xlsx
+*.pkl
+*.h5
+*.model
+*.bin
+
+# Keep specific files when using a pattern above
+!requirements.txt
+!.env.example
