@@ -1,0 +1,35 @@
+# Ignoruojame viską
+*
+
+# Dabar išvardijame failus, kuriuos norime sekti
+!.gitignore
+!README.md
+!requirements.txt
+!LICENSE
+!*.py
+
+# Tikslingai nurodome, kuriuos aplankus ir failus sekti
+!database/
+!database/**/*.py
+!app/
+!app/**/*.py
+!ml_models/
+!ml_models/**/*.py
+!preprocessing/
+!preprocessing/**/*.py
+!templates/
+!templates/**/*.html
+!static/
+!static/**/*.css
+!static/**/*.js
+!static/**/*.png
+
+# Visada ignoruojame šiuos:
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+*.log
+*.sqlite
+*.db
+.DS_Store
